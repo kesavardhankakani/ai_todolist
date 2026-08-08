@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI To-Do List Generator</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>AI To-Do List Generator</h1>
+
+        <div class="input-section">
+
+            <input
+                type="text"
+                id="goal"
+                placeholder="Enter your goal"
+            >
+
+            <input
+                type="date"
+                id="deadline"
+            >
+
+            <select id="priority">
+
+                <option value="">
+                    Select Priority
+                </option>
+
+                <option value="High">
+                    High
+                </option>
+
+                <option value="Medium">
+                    Medium
+                </option>
+
+                <option value="Low">
+                    Low
+                </option>
+
+            </select>
+
+            <button id="generateBtn">
+                Generate To-Do List
+            </button>
+
+        </div>
+
+
+        <div class="output-section">
+
+            <h2>Generated Tasks</h2>
+
+            <ul id="taskList"></ul>
+
+        </div>
+
+    </div>
+
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+
+</html>

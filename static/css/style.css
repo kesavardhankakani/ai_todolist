@@ -1,0 +1,631 @@
+/* =========================================================
+   AI TO-DO LIST GENERATOR
+   Modern UI Stylesheet
+========================================================= */
+
+
+/* =========================================================
+   GLOBAL RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+}
+
+
+/* =========================================================
+   BODY
+========================================================= */
+
+body {
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(99, 102, 241, 0.15),
+            transparent 35%
+        ),
+        linear-gradient(
+            135deg,
+            #eef2ff 0%,
+            #f8fafc 50%,
+            #e0e7ff 100%
+        );
+
+    color: #1e293b;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 30px;
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+========================================================= */
+
+.container {
+    width: 100%;
+    max-width: 650px;
+
+    padding: 40px;
+
+    background: rgba(255, 255, 255, 0.92);
+
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 24px;
+
+    box-shadow:
+        0 25px 60px rgba(15, 23, 42, 0.12),
+        0 8px 25px rgba(79, 70, 229, 0.08);
+
+    backdrop-filter: blur(12px);
+
+    animation: fadeIn 0.6s ease;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+h1 {
+    margin-bottom: 10px;
+
+    text-align: center;
+
+    color: #0f172a;
+
+    font-size: 32px;
+    font-weight: 800;
+
+    letter-spacing: -0.5px;
+}
+
+
+/* Subtitle */
+
+.container::before {
+    content: "Create a smart plan and stay organized";
+
+    display: block;
+
+    margin-bottom: 30px;
+
+    text-align: center;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   INPUT SECTION
+========================================================= */
+
+.input-section {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================================================
+   INPUTS & SELECT
+========================================================= */
+
+input,
+select {
+    width: 100%;
+
+    min-height: 50px;
+
+    padding: 13px 16px;
+
+    margin-bottom: 16px;
+
+    background: #f8fafc;
+
+    border: 1px solid #dbe2ea;
+    border-radius: 12px;
+
+    color: #1e293b;
+
+    font-size: 15px;
+
+    outline: none;
+
+    transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease,
+        transform 0.2s ease;
+}
+
+
+/* Placeholder */
+
+input::placeholder {
+    color: #94a3b8;
+}
+
+
+/* Focus */
+
+input:focus,
+select:focus {
+    background: #ffffff;
+
+    border-color: #6366f1;
+
+    box-shadow:
+        0 0 0 4px rgba(99, 102, 241, 0.12);
+
+    transform: translateY(-1px);
+}
+
+
+/* Hover */
+
+input:hover,
+select:hover {
+    border-color: #a5b4fc;
+}
+
+
+/* =========================================================
+   GENERATE BUTTON
+========================================================= */
+
+button {
+    width: 100%;
+
+    min-height: 52px;
+
+    margin-top: 5px;
+    margin-bottom: 30px;
+
+    padding: 14px 20px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: linear-gradient(
+        135deg,
+        #6366f1,
+        #4f46e5
+    );
+
+    color: #ffffff;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    letter-spacing: 0.2px;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 10px 25px rgba(79, 70, 229, 0.28);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+}
+
+
+/* Button Hover */
+
+button:hover {
+    transform: translateY(-2px);
+
+    filter: brightness(1.05);
+
+    box-shadow:
+        0 15px 30px rgba(79, 70, 229, 0.35);
+}
+
+
+/* Button Click */
+
+button:active {
+    transform: translateY(0);
+
+    box-shadow:
+        0 6px 15px rgba(79, 70, 229, 0.25);
+}
+
+
+/* Disabled / Loading */
+
+button:disabled {
+    opacity: 0.65;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+
+/* =========================================================
+   OUTPUT SECTION
+========================================================= */
+
+.output-section {
+    width: 100%;
+
+    margin-top: 5px;
+}
+
+
+/* =========================================================
+   GENERATED TASKS HEADING
+========================================================= */
+
+h2 {
+    margin-bottom: 18px;
+
+    color: #0f172a;
+
+    font-size: 22px;
+    font-weight: 750;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* Small decoration */
+
+h2::before {
+    content: "";
+
+    width: 5px;
+    height: 22px;
+
+    background: linear-gradient(
+        180deg,
+        #6366f1,
+        #4f46e5
+    );
+
+    border-radius: 10px;
+}
+
+
+/* =========================================================
+   TASK LIST
+========================================================= */
+
+#taskList {
+    width: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+
+/* =========================================================
+   TASK ITEM
+========================================================= */
+
+#taskList li {
+    position: relative;
+
+    width: 100%;
+
+    padding: 18px 20px;
+
+    margin-bottom: 12px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 5px 15px rgba(15, 23, 42, 0.05);
+
+    animation: taskAppear 0.35s ease;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+/* Task Hover */
+
+#taskList li:hover {
+    transform: translateY(-2px);
+
+    border-color: #c7d2fe;
+
+    box-shadow:
+        0 10px 25px rgba(79, 70, 229, 0.10);
+}
+
+
+/* Task Number / Title */
+
+#taskList strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #4f46e5;
+
+    font-size: 15px;
+}
+
+
+/* Task Description */
+
+#taskList p {
+    margin: 0;
+
+    color: #334155;
+
+    font-size: 15px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   GENERAL PARAGRAPHS
+========================================================= */
+
+p {
+    color: #64748b;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   LINKS
+========================================================= */
+
+a {
+    color: #4f46e5;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: color 0.2s ease;
+}
+
+
+a:hover {
+    color: #3730a3;
+
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   SUCCESS MESSAGE
+========================================================= */
+
+.success {
+    padding: 13px 16px;
+
+    margin-bottom: 15px;
+
+    background: #ecfdf5;
+
+    color: #047857;
+
+    border: 1px solid #a7f3d0;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   ERROR MESSAGE
+========================================================= */
+
+.error {
+    padding: 13px 16px;
+
+    margin-bottom: 15px;
+
+    background: #fef2f2;
+
+    color: #dc2626;
+
+    border: 1px solid #fecaca;
+
+    border-radius: 10px;
+
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card {
+    padding: 20px;
+
+    margin-bottom: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+
+    border-radius: 10px;
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+
+/* =========================================================
+   PAGE ANIMATION
+========================================================= */
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================================================
+   TASK ANIMATION
+========================================================= */
+
+@keyframes taskAppear {
+
+    from {
+        opacity: 0;
+
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform: translateY(0);
+    }
+}
+
+
+/* =========================================================
+   RESPONSIVE DESIGN
+========================================================= */
+
+@media (max-width: 700px) {
+
+    body {
+        padding: 15px;
+
+        align-items: flex-start;
+    }
+
+
+    .container {
+        max-width: 100%;
+
+        margin-top: 20px;
+
+        padding: 28px 22px;
+
+        border-radius: 20px;
+    }
+
+
+    h1 {
+        font-size: 27px;
+    }
+
+
+    h2 {
+        font-size: 20px;
+    }
+
+
+    input,
+    select {
+        min-height: 48px;
+
+        font-size: 14px;
+    }
+
+
+    button {
+        min-height: 50px;
+
+        font-size: 15px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE DEVICES
+========================================================= */
+
+@media (max-width: 400px) {
+
+    body {
+        padding: 10px;
+    }
+
+
+    .container {
+        padding: 24px 18px;
+    }
+
+
+    h1 {
+        font-size: 24px;
+    }
+
+
+    .container::before {
+        font-size: 13px;
+    }
+
+
+    #taskList li {
+        padding: 15px;
+    }
+}
