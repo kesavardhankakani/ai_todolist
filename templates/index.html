@@ -3,74 +3,425 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>AI To-Do List Generator</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <!-- CSS -->
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <title>AI To-Do Planner</title>
+
+    <meta
+        name="description"
+        content="Turn your goals into practical AI-generated action plans."
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
 </head>
+
 
 <body>
 
-    <div class="container">
+    <!-- ==================================================
+         PAGE WRAPPER
+         ================================================== -->
 
-        <h1>AI To-Do List Generator</h1>
+    <main class="app-container">
 
-        <div class="input-section">
 
-            <input
-                type="text"
-                id="goal"
-                placeholder="Enter your goal"
+        <!-- ==================================================
+             HEADER
+             ================================================== -->
+
+        <header class="hero">
+
+            <div class="hero-badge">
+                ✨ AI POWERED PRODUCTIVITY
+            </div>
+
+            <h1>
+                Turn Your Goal Into
+                <span>Action</span>
+            </h1>
+
+            <p class="hero-description">
+                Tell us what you want to accomplish and let AI
+                create a practical, step-by-step plan for you.
+            </p>
+
+        </header>
+
+
+        <!-- ==================================================
+             PLANNER CARD
+             ================================================== -->
+
+        <section class="planner-card">
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+                    🎯
+                </div>
+
+                <div>
+                    <h2>
+                        Create Your Plan
+                    </h2>
+
+                    <p>
+                        Give us a goal and a deadline.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 GOAL INPUT
+                 ================================================== -->
+
+            <div class="form-group">
+
+                <label for="goal">
+                    What do you want to accomplish?
+                </label>
+
+                <div class="input-wrapper textarea-wrapper">
+
+                    <span class="input-icon">
+                        🎯
+                    </span>
+
+                    <textarea
+                        id="goal"
+                        name="goal"
+                        rows="4"
+                        maxlength="500"
+                        placeholder="Example: Learn Python for placements in 30 days..."
+                    ></textarea>
+
+                </div>
+
+                <div class="input-helper">
+
+                    <span>
+                        Be specific for a better AI-generated plan.
+                    </span>
+
+                    <span id="goalCounter">
+                        0 / 500
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 DEADLINE + PRIORITY
+                 ================================================== -->
+
+            <div class="form-row">
+
+
+                <!-- DEADLINE -->
+
+                <div class="form-group">
+
+                    <label for="deadline">
+                        Deadline
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            📅
+                        </span>
+
+                        <input
+                            type="date"
+                            id="deadline"
+                            name="deadline"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- PRIORITY -->
+
+                <div class="form-group">
+
+                    <label for="priority">
+                        Priority
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            ⚡
+                        </span>
+
+                        <select
+                            id="priority"
+                            name="priority"
+                        >
+
+                            <option value="">
+                                Select priority
+                            </option>
+
+                            <option value="High">
+                                🔴 High
+                            </option>
+
+                            <option value="Medium">
+                                🟡 Medium
+                            </option>
+
+                            <option value="Low">
+                                🟢 Low
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 ERROR MESSAGE
+                 ================================================== -->
+
+            <div
+                id="errorMessage"
+                class="error-message hidden"
             >
 
-            <input
-                type="date"
-                id="deadline"
+                <span class="error-icon">
+                    ⚠️
+                </span>
+
+                <div>
+                    <strong>
+                        Something went wrong
+                    </strong>
+
+                    <p id="errorText">
+                        Please try again.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 GENERATE BUTTON
+                 ================================================== -->
+
+            <button
+                id="generateBtn"
+                class="generate-btn"
+                type="button"
             >
 
-            <select id="priority">
+                <span
+                    id="generateIcon"
+                    class="button-icon"
+                >
+                    ✨
+                </span>
 
-                <option value="">
-                    Select Priority
-                </option>
+                <span id="generateText">
+                    Generate My Plan
+                </span>
 
-                <option value="High">
-                    High
-                </option>
-
-                <option value="Medium">
-                    Medium
-                </option>
-
-                <option value="Low">
-                    Low
-                </option>
-
-            </select>
-
-            <button id="generateBtn">
-                Generate To-Do List
             </button>
 
-        </div>
+
+            <p class="privacy-note">
+                🔒 Your goal is used only to generate your plan.
+            </p>
+
+        </section>
 
 
-        <div class="output-section">
+        <!-- ==================================================
+             LOADING SECTION
+             ================================================== -->
 
-            <h2>Generated Tasks</h2>
+        <section
+            id="loadingSection"
+            class="loading-section hidden"
+        >
 
-            <ul id="taskList"></ul>
+            <div class="loading-animation">
 
-        </div>
+                <div class="loading-circle"></div>
 
-    </div>
+            </div>
+
+            <h3>
+                Building your plan...
+            </h3>
+
+            <p>
+                AI is turning your goal into actionable tasks.
+            </p>
+
+        </section>
 
 
-    <!-- JavaScript -->
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+        <!-- ==================================================
+             RESULTS SECTION
+             ================================================== -->
+
+        <section
+            id="resultsSection"
+            class="results-section hidden"
+        >
+
+
+            <!-- ==================================================
+                 RESULTS HEADER
+                 ================================================== -->
+
+            <div class="results-header">
+
+                <div>
+
+                    <div class="results-label">
+                        ✨ AI GENERATED PLAN
+                    </div>
+
+                    <h2>
+                        Your Action Plan
+                    </h2>
+
+                    <p id="resultGoal">
+                        Your personalized tasks are ready.
+                    </p>
+
+                </div>
+
+
+                <button
+                    id="regenerateBtn"
+                    class="secondary-btn"
+                    type="button"
+                >
+                    🔄 Regenerate
+                </button>
+
+            </div>
+
+
+            <!-- ==================================================
+                 PROGRESS
+                 ================================================== -->
+
+            <div class="progress-card">
+
+                <div class="progress-top">
+
+                    <div>
+
+                        <span class="progress-title">
+                            Your Progress
+                        </span>
+
+                        <span
+                            id="progressText"
+                            class="progress-count"
+                        >
+                            0 / 0 completed
+                        </span>
+
+                    </div>
+
+                    <strong id="progressPercentage">
+                        0%
+                    </strong>
+
+                </div>
+
+
+                <div class="progress-track">
+
+                    <div
+                        id="progressBar"
+                        class="progress-bar"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==================================================
+                 TASK LIST
+                 ================================================== -->
+
+            <div
+                id="taskList"
+                class="task-list"
+            ></div>
+
+
+            <!-- ==================================================
+                 RESULT FOOTER
+                 ================================================== -->
+
+            <div class="result-footer">
+
+                <button
+                    id="newPlanBtn"
+                    class="new-plan-btn"
+                    type="button"
+                >
+                    + Create New Plan
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ==================================================
+             FOOTER
+             ================================================== -->
+
+        <footer class="app-footer">
+
+            <p>
+                Built with Python, Flask & AI
+            </p>
+
+            <p>
+                Learn by building. Build by solving.
+            </p>
+
+        </footer>
+
+
+    </main>
+
+
+    <!-- ======================================================
+         JAVASCRIPT
+         ====================================================== -->
+
+    <script
+        src="{{ url_for('static', filename='js/app.js') }}"
+    ></script>
 
 </body>
 

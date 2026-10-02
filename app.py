@@ -4,93 +4,149 @@ from dotenv import load_dotenv
 import os
 import json
 
-# Load .env file
+
+# ============================================================
+# LOAD ENVIRONMENT VARIABLES
+# ============================================================
+
 load_dotenv()
 
-# Create Flask application
 app = Flask(__name__)
 
-# Get Groq API key
 api_key = os.getenv("GROQ_API_KEY")
 
-# Check API key
-print("API KEY FOUND:", bool(api_key))
+print("========================================")
+print("AI TODO LIST APPLICATION")
+print("========================================")
+print("GROQ API KEY FOUND:", bool(api_key))
 
-# Create Groq client
-client = OpenAI(
-    api_key=api_key,
-    base_url="https://api.groq.com/openai/v1"
-)
 
-# ==================================================
+# ============================================================
+# GROQ CLIENT
+# ============================================================
+
+client = None
+
+if api_key:
+    client = OpenAI(
+        api_key=api_key,
+        base_url="https://api.groq.com/openai/v1"
+    )
+
+
+# ============================================================
 # HOME PAGE
-# ==================================================
+# ============================================================
 
 @app.route("/")
 def home():
-
     return render_template("index.html")
 
 
-# ==================================================
-# AI TO-DO GENERATOR
-# ==================================================
+# ============================================================
+# HEALTH CHECK
+# ============================================================
+
+@app.route("/health")
+def health():
+    return jsonify({
+        "status": "healthy",
+        "api_key_configured": bool(api_key)
+    })
+
+
+# ============================================================
+# AI TODO GENERATOR
+# ============================================================
 
 @app.route("/generate", methods=["POST"])
 def generate():
 
     try:
 
-        # Get data from JavaScript
-        data = request.get_json()
+        # ----------------------------------------------------
+        # Check API configuration
+        # ----------------------------------------------------
 
-        goal = data.get("goal")
-        deadline = data.get("deadline")
-        priority = data.get("priority")
+        if not api_key or client is None:
+            return jsonify({
+                "success": False,
+                "error": "AI service is not configured. GROQ_API_KEY is missing."
+            }), 500
 
 
-        # ------------------------------------------
+        # ----------------------------------------------------
+        # Read JSON request
+        # ----------------------------------------------------
+
+        data = request.get_json(silent=True)
+
+        if not data:
+            return jsonify({
+                "success": False,
+                "error": "Invalid request. No data was received."
+            }), 400
+
+
+        # ----------------------------------------------------
+        # Extract user input
+        # ----------------------------------------------------
+
+        goal = str(data.get("goal", "")).strip()
+        deadline = str(data.get("deadline", "")).strip()
+        priority = str(data.get("priority", "")).strip()
+
+
+        # ----------------------------------------------------
         # Validate input
-        # ------------------------------------------
+        # ----------------------------------------------------
 
         if not goal:
-
             return jsonify({
-                "error": "Goal is required"
+                "success": False,
+                "error": "Please enter a goal."
             }), 400
 
+        if len(goal) < 3:
+            return jsonify({
+                "success": False,
+                "error": "Please enter a more detailed goal."
+            }), 400
 
         if not deadline:
-
             return jsonify({
-                "error": "Deadline is required"
+                "success": False,
+                "error": "Please select a deadline."
             }), 400
-
 
         if not priority:
-
             return jsonify({
-                "error": "Priority is required"
+                "success": False,
+                "error": "Please select a priority."
             }), 400
 
 
-        print("\n================================")
-        print("AI TO-DO REQUEST")
-        print("================================")
+        # ----------------------------------------------------
+        # Debug information
+        # ----------------------------------------------------
 
+        print("\n========================================")
+        print("NEW AI TODO REQUEST")
+        print("========================================")
         print("Goal:", goal)
         print("Deadline:", deadline)
         print("Priority:", priority)
 
 
-        # ------------------------------------------
-        # Prompt for AI
-        # ------------------------------------------
+        # ====================================================
+        # AI PROMPT
+        # ====================================================
 
         prompt = f"""
-You are an expert AI productivity assistant.
+You are an expert productivity planner.
 
-Create a personalized and realistic to-do list.
+Your job is to convert a user's goal into a practical,
+specific and achievable action plan.
 
 USER GOAL:
 {goal}
@@ -101,47 +157,77 @@ DEADLINE:
 PRIORITY:
 {priority}
 
-REQUIREMENTS:
+Create a realistic plan that helps the user actually
+achieve this goal.
 
-1. Generate 8 to 10 tasks.
-2. Every task must directly help achieve the user's goal.
-3. Do NOT generate generic tasks.
-4. Do NOT say things like "start working on your goal".
-5. Tasks must be specific and actionable.
+RULES:
+
+1. Generate between 8 and 10 tasks.
+
+2. Every task must directly contribute to the goal.
+
+3. Tasks must be specific and actionable.
+
+4. Do not create vague tasks such as:
+   - "Work on the goal"
+   - "Start studying"
+   - "Keep practicing"
+   - "Do research"
+
+5. Break large goals into smaller practical steps.
+
 6. Arrange tasks in a logical order.
-7. Consider the deadline.
-8. Consider the priority level.
-9. Make the tasks realistic for a normal person.
-10. Each task should be short and clear.
-11. Return ONLY a JSON array.
-12. Do not use Markdown.
-13. Do not add explanations.
 
-Example:
+7. Consider the deadline when planning the tasks.
 
-[
-    "Research the fundamentals of the topic",
-    "Create a realistic daily schedule",
-    "Practice the first major skill",
-    "Complete a small practical project"
-]
+8. Consider the priority:
+   - High = important and focused plan
+   - Medium = balanced plan
+   - Low = flexible plan
+
+9. Make the plan realistic for one person.
+
+10. Avoid unnecessary repetition.
+
+11. Each task should be short and easy to understand.
+
+12. Do not include task numbers.
+
+13. Do not include Markdown.
+
+14. Do not include explanations outside the JSON.
+
+15. Return ONLY valid JSON.
+
+The JSON must use exactly this structure:
+
+{{
+    "tasks": [
+        "Specific actionable task 1",
+        "Specific actionable task 2",
+        "Specific actionable task 3"
+    ]
+}}
 """
 
 
-        # ------------------------------------------
-        # Call Groq AI
-        # ------------------------------------------
+        # ====================================================
+        # CALL GROQ
+        # ====================================================
+
+        print("\nSending request to Groq...")
+
 
         response = client.chat.completions.create(
 
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-120b",
 
             messages=[
                 {
                     "role": "system",
                     "content": (
-                        "You are an expert AI productivity "
-                        "and task planning assistant."
+                        "You are a professional AI productivity "
+                        "planner. Always return valid JSON."
                     )
                 },
                 {
@@ -150,102 +236,149 @@ Example:
                 }
             ],
 
-            temperature=0.7,
+            temperature=0.5,
 
             response_format={
                 "type": "json_object"
             }
-
         )
 
 
-        # ------------------------------------------
-        # Get AI response
-        # ------------------------------------------
+        # ====================================================
+        # READ AI RESPONSE
+        # ====================================================
+
+        if not response.choices:
+            raise ValueError("AI returned no response.")
+
 
         ai_response = response.choices[0].message.content
+
+
+        if not ai_response:
+            raise ValueError("AI returned an empty response.")
+
 
         print("\nAI RESPONSE:")
         print(ai_response)
 
 
-        # ------------------------------------------
-        # Convert response to Python
-        # ------------------------------------------
+        # ====================================================
+        # PARSE JSON
+        # ====================================================
 
-        result = json.loads(ai_response)
+        try:
 
+            result = json.loads(ai_response)
 
-        # ------------------------------------------
-        # Get tasks
-        # ------------------------------------------
+        except json.JSONDecodeError as json_error:
 
-        if isinstance(result, dict) and "tasks" in result:
-
-            tasks = result["tasks"]
-
-        elif isinstance(result, list):
-
-            tasks = result
-
-        else:
+            print("\nJSON PARSE ERROR:")
+            print(str(json_error))
 
             raise ValueError(
-                "AI returned an invalid task format"
+                "AI returned an invalid JSON response."
             )
 
 
-        # ------------------------------------------
-        # Validate tasks
-        # ------------------------------------------
+        # ====================================================
+        # EXTRACT TASKS
+        # ====================================================
+
+        tasks = result.get("tasks")
+
 
         if not isinstance(tasks, list):
-
             raise ValueError(
-                "Tasks are not in list format"
+                "AI response does not contain a valid task list."
             )
 
 
-        if len(tasks) == 0:
+        # ====================================================
+        # CLEAN TASKS
+        # ====================================================
 
-            raise ValueError(
-                "AI returned no tasks"
-            )
-
-
-        print("\nGenerated tasks:")
+        cleaned_tasks = []
 
         for task in tasks:
-            print("-", task)
+
+            if isinstance(task, str):
+
+                task = task.strip()
+
+                if task:
+                    cleaned_tasks.append(task)
 
 
-        # ------------------------------------------
-        # Send tasks to JavaScript
-        # ------------------------------------------
+        # ====================================================
+        # VALIDATE TASK COUNT
+        # ====================================================
+
+        if not cleaned_tasks:
+
+            raise ValueError(
+                "AI generated no usable tasks."
+            )
+
+
+        # Keep the application controlled even if AI returns
+        # more tasks than requested.
+
+        cleaned_tasks = cleaned_tasks[:10]
+
+
+        print("\nGENERATED TASKS:")
+
+        for index, task in enumerate(cleaned_tasks, start=1):
+            print(f"{index}. {task}")
+
+
+        # ====================================================
+        # SEND RESPONSE TO FRONTEND
+        # ====================================================
 
         return jsonify({
-            "tasks": tasks
+
+            "success": True,
+
+            "tasks": cleaned_tasks,
+
+            "count": len(cleaned_tasks)
+
         })
 
 
-    except Exception as e:
+    # ========================================================
+    # OPENAI / GROQ API ERRORS
+    # ========================================================
 
-        print("\n================================")
-        print("ERROR")
-        print("================================")
+    except Exception as error:
 
-        print(str(e))
+        print("\n========================================")
+        print("AI GENERATION ERROR")
+        print("========================================")
+        print(type(error).__name__)
+        print(str(error))
 
 
         return jsonify({
-            "error": str(e)
+
+            "success": False,
+
+            "error": str(error)
+
         }), 500
 
 
-# ==================================================
-# START FLASK
-# ==================================================
+# ============================================================
+# RUN APPLICATION
+# ============================================================
 
 if __name__ == "__main__":
 
-    app.run(debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
+        debug=True
+    )
+    
